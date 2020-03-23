@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"time"
 
 	"github.com/gorilla/mux"
 	_ "github.com/mattn/go-sqlite3"
@@ -17,25 +16,6 @@ var LogStore Database
 
 //ServiceName is the name of this service. It will match the service in the config file.
 var ServiceName string
-
-//LogLine represents fields in a given log line
-type LogLine struct {
-	RawLog        string
-	RemoteAddr    string
-	TimeLocal     string
-	RequestType   string
-	RequestPath   string
-	Status        int
-	BodyBytesSent int
-	HTTPReferer   string
-	HTTPUserAgent string
-	Created       time.Time
-}
-
-//LogFile represents a logfile with multiple lines
-type LogFile struct {
-	Logs []LogLine
-}
 
 //ReadConfig reads the config from a file
 func ReadConfig() {
@@ -55,7 +35,7 @@ func main() {
 
 	//Start DB connection
 	LogStore = Database{}
-	ServiceName = "monolith"
+	ServiceName = "ms-line-count"
 
 	//read config from file using viper.
 	ReadConfig()
@@ -69,15 +49,9 @@ func main() {
 	}
 	defer LogStore.db.Close()
 
-	//Create table if not found
-	LogStore.dbInit()
-
 	//Define routes.
 	r := mux.NewRouter()
-	r.HandleFunc("/browser/count", BasicAuth(handleBrowserCount, "read", "Please enter your username and password for this site")).Methods("GET")
-	r.HandleFunc("/visitor/count", BasicAuth(handleVisitorCount, "read", "Please enter your username and password for this site")).Methods("GET")
-	r.HandleFunc("/", BasicAuth(handleServeUploadPage, "write", "Please enter your username and password for this site"))
-	r.HandleFunc("/upload/log", BasicAuth(handleUploadLog, "write", "Please enter your username and password for this site"))
+	r.HandleFunc("/lines/count", handleLineCount).Methods("POST")
 	log.Println("Listening on: ", viper.GetString("endpoints."+ServiceName))
 	log.Fatal(http.ListenAndServe(":"+viper.GetString("endpoints."+ServiceName), r))
 }

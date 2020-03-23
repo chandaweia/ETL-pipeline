@@ -5,6 +5,7 @@ import (
 	"fmt"
 )
 
+//BrowserCountRow represents a row in the database for browser counts
 type BrowserCountRow struct {
 	Key     string
 	Date    string
@@ -12,11 +13,13 @@ type BrowserCountRow struct {
 	Count   int
 }
 
+//VisitorCountRow represents a row in the database for visitor counts
 type VisitorCountRow struct {
 	Key   string
 	Count int
 }
 
+//User represents a row in the database for Users
 type User struct {
 	ID       int
 	User     string
@@ -29,6 +32,7 @@ type Database struct {
 	db *sql.DB
 }
 
+//fetchUserAuth Allows you to specifiy a permission and query users with that permission.
 func (d *Database) fetchUserAuth(perm string) []User {
 	var sqlStmt string
 	if perm == "read" {
@@ -71,7 +75,6 @@ func (d *Database) storeBrowserCount(key string, dt string, b string, c int) boo
 		return false
 	}
 
-	//add admin
 	_, err = statement.Exec(key, dt, b, c)
 
 	if err != nil {

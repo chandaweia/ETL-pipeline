@@ -6,16 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"strings"
 )
-
-func fetchAcceptType(header string) string {
-	if strings.Contains(header, "application/json") {
-		return "json"
-	}
-	return "html"
-
-}
 
 //BasicAuth handles authentication for username and password
 func BasicAuth(handler http.HandlerFunc, perm, realm string) http.HandlerFunc {
@@ -65,7 +56,7 @@ func handleBrowserCount(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, string(jOut))
 }
 
-//fetchBrowserCounts
+//handleVisitorCounts handles visitor counts
 func handleVisitorCount(w http.ResponseWriter, r *http.Request) {
 
 	visitorData := LogStore.fetchVisitorData()
@@ -121,10 +112,12 @@ func handleUploadLog(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(err)
 	}
 
-	//fmt.Println("File Contents", string(fileBytes))
-
 	// return that we have successfully uploaded our file!
 	processLogFile(fileBytes)
 	w.WriteHeader(http.StatusOK)
-	fmt.Fprintf(w, "Log File Uploaded Successfully")
+	fmt.Fprintf(w, "<h1>Pipeline Status</h1>")
+	fmt.Fprintf(w, "Log File Uploaded Successfully<br>")
+	fmt.Fprintf(w, `<strong>Count Browsers</strong>: <font size="3" color="green">Completed</font><br>`)
+	fmt.Fprintf(w, `<strong>Count Visitors</strong>: <font size="3" color="green">Completed</font><br>`)
+
 }

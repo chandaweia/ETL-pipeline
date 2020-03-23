@@ -4,9 +4,40 @@ import (
 	"bufio"
 	"fmt"
 	"log"
+	"strconv"
 	"strings"
 	"time"
 )
+
+//parseFile will take a slice of strings and parse the fields.
+func parseFile(lines []string) LogFile {
+
+	//list to store log lines
+	lf := LogFile{}
+
+	for _, line := range lines {
+
+		lineSplit := strings.Split(line, " ")
+		userAgent := strings.Join(lineSplit[11:], " ")
+		status, _ := strconv.Atoi(lineSplit[8])
+		totalBytes, _ := strconv.Atoi(lineSplit[9])
+		tempLine := LogLine{
+			line,
+			lineSplit[0],
+			lineSplit[3] + " " + lineSplit[4],
+			lineSplit[5],
+			lineSplit[6],
+			status,
+			totalBytes,
+			lineSplit[10],
+			userAgent,
+			time.Now(),
+		}
+
+		lf.Logs = append(lf.Logs, tempLine)
+	}
+	return lf
+}
 
 //processLogFile takes in an uploaded logfile, stores the data, processes stats.
 func processLogFile(rawLogFile []byte) bool {
@@ -117,14 +148,11 @@ func countVisitors(LogStore Database) {
 		visitorCount[k] = len(v)
 	}
 
-	//print the counts
 	for k, v := range visitorCount {
-		//fmt.Println(k, ": ", v)
+		//store data in database.
 		if !LogStore.storeVisitorCount(k, v) {
 			fmt.Println("Failed to store ", k)
 		}
 	}
-
-	//write to database
 
 }
