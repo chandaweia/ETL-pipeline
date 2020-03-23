@@ -1,0 +1,6 @@
+endpoints:
+  ms-gateway: 80
+  ms-auth: 4001
+  ms-line-count: 4002
+  ms-browser-count: 4003
+  ms-visitor-count: 4004
