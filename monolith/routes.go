@@ -113,7 +113,7 @@ func handleUploadLog(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// return that we have successfully uploaded our file!
-	processLogFile(fileBytes)
+	processLogFile(fileBytes, handler.Filename)
 	w.WriteHeader(http.StatusOK)
 	fmt.Fprintf(w, "<h1>Pipeline Status</h1>")
 	fmt.Fprintf(w, "Log File Uploaded Successfully<br>")

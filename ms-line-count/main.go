@@ -33,9 +33,11 @@ func ReadConfig() {
 
 func main() {
 
+	//DEFINE THE SERVICE NAME. CHANGE THIS TO MATCH A LINE IN CONFIG FILE
+	ServiceName = "ms-line-count"
+
 	//Start DB connection
 	LogStore = Database{}
-	ServiceName = "ms-line-count"
 
 	//read config from file using viper.
 	ReadConfig()
@@ -51,17 +53,8 @@ func main() {
 
 	//Define routes.
 	r := mux.NewRouter()
-	r.HandleFunc("/lines/count", handleLineCount).Methods("POST")
+	r.HandleFunc("/lines/count", handleCountLines).Methods("POST")
+	r.HandleFunc("/lines/count/{fname}", handleLineCount).Methods("GET")
 	log.Println("Listening on: ", viper.GetString("endpoints."+ServiceName))
 	log.Fatal(http.ListenAndServe(":"+viper.GetString("endpoints."+ServiceName), r))
-}
-
-//check if element found in golang string
-func checkExists(list []string, v string) bool {
-	for _, a := range list {
-		if a == v {
-			return true
-		}
-	}
-	return false
 }

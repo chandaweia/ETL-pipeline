@@ -20,6 +20,7 @@ var ServiceName string
 
 //LogLine represents fields in a given log line
 type LogLine struct {
+	Name          string
 	RawLog        string
 	RemoteAddr    string
 	TimeLocal     string

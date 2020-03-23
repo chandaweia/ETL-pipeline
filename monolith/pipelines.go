@@ -10,7 +10,7 @@ import (
 )
 
 //parseFile will take a slice of strings and parse the fields.
-func parseFile(lines []string) LogFile {
+func parseFile(lines []string, fname string) LogFile {
 
 	//list to store log lines
 	lf := LogFile{}
@@ -22,6 +22,7 @@ func parseFile(lines []string) LogFile {
 		status, _ := strconv.Atoi(lineSplit[8])
 		totalBytes, _ := strconv.Atoi(lineSplit[9])
 		tempLine := LogLine{
+			fname,
 			line,
 			lineSplit[0],
 			lineSplit[3] + " " + lineSplit[4],
@@ -40,7 +41,7 @@ func parseFile(lines []string) LogFile {
 }
 
 //processLogFile takes in an uploaded logfile, stores the data, processes stats.
-func processLogFile(rawLogFile []byte) bool {
+func processLogFile(rawLogFile []byte, fname string) bool {
 	var lines []string
 	scanner := bufio.NewScanner(strings.NewReader(string(rawLogFile)))
 
@@ -48,7 +49,7 @@ func processLogFile(rawLogFile []byte) bool {
 		lines = append(lines, scanner.Text())
 	}
 
-	logFile := parseFile(lines)
+	logFile := parseFile(lines, fname)
 
 	//Store parsed logs
 	LogStore.StoreLogLine(logFile)

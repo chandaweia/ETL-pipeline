@@ -112,7 +112,7 @@ func (d *Database) storeVisitorCount(key string, vc int) bool {
 func (d *Database) StoreLogLine(lf LogFile) {
 
 	sqlStmt := `
-	INSERT INTO logs (raw_log, 
+	INSERT INTO logs (name, raw_log, 
 		remote_addr,
 		time_local,
 		request_type,
@@ -122,7 +122,7 @@ func (d *Database) StoreLogLine(lf LogFile) {
 		http_referer,
 		http_user_agent,
 		created
-		) VALUES (?, ?,?,?,?,?,?,?,?,?)
+		) VALUES (?,?, ?,?,?,?,?,?,?,?,?)
 	`
 	statement, err := d.db.Prepare(sqlStmt)
 	if err != nil {
@@ -131,7 +131,7 @@ func (d *Database) StoreLogLine(lf LogFile) {
 	}
 	for _, v := range lf.Logs {
 
-		statement.Exec(v.RawLog, v.RemoteAddr, v.TimeLocal, v.RequestType, v.RequestPath, v.Status, v.BodyBytesSent, v.HTTPReferer, v.HTTPUserAgent, v.Created)
+		statement.Exec(v.Name, v.RawLog, v.RemoteAddr, v.TimeLocal, v.RequestType, v.RequestPath, v.Status, v.BodyBytesSent, v.HTTPReferer, v.HTTPUserAgent, v.Created)
 	}
 }
 
@@ -182,7 +182,7 @@ func (d *Database) fetchData() LogFile {
 	lf := LogFile{}
 	for rows.Next() {
 		logLine := LogLine{}
-		rows.Scan(&logLine.RawLog,
+		rows.Scan(&logLine.Name, &logLine.RawLog,
 			&logLine.RemoteAddr,
 			&logLine.TimeLocal,
 			&logLine.RequestType,
@@ -201,6 +201,7 @@ func (d *Database) fetchData() LogFile {
 func (d *Database) dbInit() {
 	sqlStmt := `
 	CREATE TABLE IF NOT EXISTS logs (
+		name TEXT NOT NULL,
 		raw_log TEXT NOT NULL UNIQUE,
 		remote_addr TEXT,
 		time_local TEXT,
