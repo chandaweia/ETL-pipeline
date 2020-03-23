@@ -24,14 +24,16 @@ func handleCountLines(w http.ResponseWriter, r *http.Request) {
 	//decode data in body
 	err := json.NewDecoder(r.Body).Decode(&CLR)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		e := NewError(http.StatusBadRequest, err.Error())
+		http.Error(w, e.json, http.StatusBadRequest)
 		return
 	}
 
 	//fetch data for file name
 	lf, err := LogStore.fetchData(CLR.FName)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		e := NewError(http.StatusBadRequest, err.Error())
+		http.Error(w, e.json, http.StatusBadRequest)
 		return
 	}
 
@@ -40,7 +42,8 @@ func handleCountLines(w http.ResponseWriter, r *http.Request) {
 	//store num count
 	err = LogStore.StoreCountLines(CLR.FName, len(lf.Logs))
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		e := NewError(http.StatusBadRequest, err.Error())
+		http.Error(w, e.json, http.StatusBadRequest)
 		return
 	}
 
@@ -60,29 +63,26 @@ func handleLineCount(w http.ResponseWriter, r *http.Request) {
 
 	lc, err := LogStore.fetchLineCount(fname)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		e := NewError(http.StatusBadRequest, err.Error())
+		http.Error(w, e.json, e.StatusCode)
 		return
 	}
 
-	lineCountMap := make(map[string]int)
+	//No results returned. Return not found
+	if len(lc) < 1 {
+		e := NewError(http.StatusNotFound, "File "+fname+" not found!")
+		http.Error(w, e.json, http.StatusBadRequest)
+		return
+	}
 
+	//Create map for response of results
+	lineCountMap := make(map[string]int)
 	lineCountMap[fname] = lc[0].Count
 
-	// dataOut, err := json.Marshal(lineCountMap)
-	// if err != nil {
-	// 	fmt.Println("Error Unmarshalling data", err)
-	// 	http.Error(w, err.Error(), http.StatusBadRequest)
-	// 	return
-	// }
-
+	//create response and get json
 	res := Response{201, "Success", lineCountMap}
+	jOut, _ := res.JSON()
 
-	jOut, err := json.Marshal(res)
-	if err != nil {
-		fmt.Println("Error Unmarshalling data", err)
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
 	w.WriteHeader(http.StatusOK)
 	fmt.Fprintf(w, string(jOut))
 }
