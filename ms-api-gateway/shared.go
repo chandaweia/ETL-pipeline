@@ -1,10 +1,8 @@
 package main
 
 import (
-	"database/sql"
 	"encoding/json"
 	"fmt"
-	"log"
 	"time"
 )
 
@@ -28,11 +26,24 @@ type LogLine struct {
 	Created       time.Time
 }
 
-//Response HTTP RESPONSE for messages
-type Response struct {
+//ResponseInt HTTP RESPONSE for messages
+type ResponseInt struct {
 	StatusCode int            `json:"statusCode"`
 	Message    string         `json:"message"`
 	Data       map[string]int `json:"data"`
+}
+
+//Response HTTP RESPONSE for messages
+type ResponseString struct {
+	StatusCode int               `json:"statusCode"`
+	Message    string            `json:"message"`
+	Data       map[string]string `json:"data"`
+}
+
+//Response HTTP RESPONSE for messages
+type Response struct {
+	StatusCode int    `json:"statusCode"`
+	Message    string `json:"message"`
 }
 
 //ErrorResponse, response to send when erroring out
@@ -48,6 +59,50 @@ func NewError(code int, e string) ErrorResponse {
 	temp, _ := err.JSON()
 	err.json = temp
 	return err
+}
+
+//ConvertMapInterfaceToMapString converts generic interface to string/string
+func ConvertMapInterfaceToMapString(m interface{}) map[string]string {
+
+	result_map := map[string]string{}
+	for key, value := range m.(map[string]interface{}) {
+		result_map[key] = value.(string)
+	}
+
+	return result_map
+}
+
+//ConvertMapInterfaceToMapInt converts generic interface to string/int
+func ConvertMapInterfaceToMapInt(m interface{}) map[string]int {
+
+	result_map := map[string]int{}
+	for key, value := range m.(map[string]interface{}) {
+		result_map[key] = int(value.(float64))
+	}
+
+	return result_map
+}
+
+//JSON returns json version of type
+func (r *ResponseInt) JSON() (string, error) {
+	jOut, err := json.Marshal(r)
+	if err != nil {
+		fmt.Println("Error Unmarshalling data", err)
+		return "", err
+	}
+
+	return string(jOut), nil
+}
+
+//JSON returns json version of type
+func (r *ResponseString) JSON() (string, error) {
+	jOut, err := json.Marshal(r)
+	if err != nil {
+		fmt.Println("Error Unmarshalling data", err)
+		return "", err
+	}
+
+	return string(jOut), nil
 }
 
 //JSON returns json version of type
@@ -70,95 +125,4 @@ func (r *ErrorResponse) JSON() (string, error) {
 	}
 
 	return string(jOut), nil
-}
-
-//LineCountRow represents a row in the database for line counts
-type LineCountRow struct {
-	Key   string
-	Count int
-}
-
-//Database controls database functionality
-type Database struct {
-	db *sql.DB
-}
-
-//StoreCountLines stores a logfile in a database
-func (d *Database) StoreCountLines(fname string, count int) error {
-
-	sqlStmt := `
-	INSERT INTO lineCount (key, count)
-	VALUES (?,?)
-	`
-	statement, err := d.db.Prepare(sqlStmt)
-	if err != nil {
-		fmt.Println(err)
-		return err
-	}
-
-	_, err = statement.Exec(fname, count)
-	if err != nil {
-		log.Println("Failed to execute sql", err)
-		return err
-	}
-
-	return nil
-
-}
-
-//fetchData allows you to fetch log data from db.
-func (d *Database) fetchLineCount(fname string) ([]LineCountRow, error) {
-	rows, _ := d.db.Query("SELECT * FROM lineCount where key='" + fname + "'")
-	lc := []LineCountRow{}
-	for rows.Next() {
-		lcr := LineCountRow{}
-		err := rows.Scan(&lcr.Key,
-			&lcr.Count)
-		if err != nil {
-			log.Println("Failed to fetch data from db: ", err)
-			return lc, err
-		}
-		lc = append(lc, lcr)
-	}
-	return lc, nil
-}
-
-//fetchData allows you to fetch log data from db.
-func (d *Database) fetchData(fname string) (LogFile, error) {
-	rows, _ := d.db.Query("SELECT * FROM logs where name='" + fname + "'")
-	lf := LogFile{}
-	for rows.Next() {
-		logLine := LogLine{}
-		err := rows.Scan(&logLine.Name,
-			&logLine.RawLog,
-			&logLine.RemoteAddr,
-			&logLine.TimeLocal,
-			&logLine.RequestType,
-			&logLine.RequestPath,
-			&logLine.Status,
-			&logLine.BodyBytesSent,
-			&logLine.HTTPReferer,
-			&logLine.HTTPUserAgent,
-			&logLine.Created)
-		if err != nil {
-			log.Println("Failed to fetch data from db: ", err)
-			return lf, err
-		}
-		lf.Logs = append(lf.Logs, logLine)
-	}
-	return lf, nil
-}
-
-func (d *Database) dbinit() {
-
-	//create browser table
-	sqlStmt := `
-	CREATE TABLE IF NOT EXISTS lineCount (
-		key TEXT,
-		count int
-		)
-	`
-
-	statement, _ := d.db.Prepare(sqlStmt)
-	statement.Exec()
 }

@@ -26,11 +26,24 @@ type LogLine struct {
 	Created       time.Time
 }
 
-//Response HTTP RESPONSE for messages
-type Response struct {
+//ResponseInt HTTP RESPONSE for messages
+type ResponseInt struct {
 	StatusCode int            `json:"statusCode"`
 	Message    string         `json:"message"`
 	Data       map[string]int `json:"data"`
+}
+
+//Response HTTP RESPONSE for messages
+type ResponseString struct {
+	StatusCode int               `json:"statusCode"`
+	Message    string            `json:"message"`
+	Data       map[string]string `json:"data"`
+}
+
+//Response HTTP RESPONSE for messages
+type Response struct {
+	StatusCode int    `json:"statusCode"`
+	Message    string `json:"message"`
 }
 
 //ErrorResponse, response to send when erroring out
@@ -46,6 +59,28 @@ func NewError(code int, e string) ErrorResponse {
 	temp, _ := err.JSON()
 	err.json = temp
 	return err
+}
+
+//JSON returns json version of type
+func (r *ResponseInt) JSON() (string, error) {
+	jOut, err := json.Marshal(r)
+	if err != nil {
+		fmt.Println("Error Unmarshalling data", err)
+		return "", err
+	}
+
+	return string(jOut), nil
+}
+
+//JSON returns json version of type
+func (r *ResponseString) JSON() (string, error) {
+	jOut, err := json.Marshal(r)
+	if err != nil {
+		fmt.Println("Error Unmarshalling data", err)
+		return "", err
+	}
+
+	return string(jOut), nil
 }
 
 //JSON returns json version of type

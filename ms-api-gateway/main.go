@@ -53,8 +53,9 @@ func main() {
 
 	//Define routes.
 	r := mux.NewRouter()
+	r.HandleFunc("/lines/count/{fname}", handleLinesCount).Methods("GET")
 	r.HandleFunc("/", handleServeUploadPage)
 	r.HandleFunc("/upload/log", handleUploadLog)
-	log.Println("Listening on: ", viper.GetString("endpoints."+ServiceName))
-	log.Fatal(http.ListenAndServe(":"+viper.GetString("endpoints."+ServiceName), r))
+	log.Println("Listening on: ", viper.GetString("services."+ServiceName))
+	log.Fatal(http.ListenAndServe(":"+viper.GetString("services."+ServiceName), r))
 }

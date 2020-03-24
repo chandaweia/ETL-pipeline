@@ -1,28 +1,54 @@
 package main
 
 import (
-	"bufio"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
-	"strings"
+
+	"github.com/gorilla/mux"
+	"github.com/spf13/viper"
 )
 
-//processLogFile takes in an uploaded logfile, stores the data, processes stats.
-func processLogFile(rawLogFile []byte, fname string) bool {
-	var lines []string
-	scanner := bufio.NewScanner(strings.NewReader(string(rawLogFile)))
+//handleLinesCount handles fetching line counts
+func handleLinesCount(w http.ResponseWriter, r *http.Request) {
 
-	for scanner.Scan() {
-		lines = append(lines, scanner.Text())
+	//fetch parameters from url
+	params := mux.Vars(r)
+
+	fname := params["fname"]
+	url := "http://localhost:" + viper.GetString("services.ms-line-count") + "/lines/count/" + fname
+
+	log.Println("Fetching URL: ", url)
+	//make request to ms
+	resp, err := http.Get(url)
+	if err != nil {
+		e := NewError(http.StatusBadRequest, err.Error())
+		http.Error(w, e.json, http.StatusBadRequest)
+		return
+	}
+	defer resp.Body.Close()
+
+	//decode reesponse body
+	var result map[string]interface{}
+	json.NewDecoder(resp.Body).Decode(&result)
+
+	//if statusCode is above 300 then its an error, parse and return
+	if result["statusCode"].(float64) > 300 {
+		log.Println("Error", result["error"].(string))
+		e := NewError(http.StatusInternalServerError, result["error"].(string))
+		http.Error(w, e.json, http.StatusBadRequest)
+		return
 	}
 
-	logFile := parseFile(lines, fname)
+	//convert response to proper response
+	resOut := ResponseInt{int(result["statusCode"].(float64)), result["message"].(string), ConvertMapInterfaceToMapInt(result["data"])}
+	jOut, _ := resOut.JSON()
 
-	//Store parsed logs
-	LogStore.StoreLogLine(logFile)
-
-	return true
+	//return response to client
+	w.WriteHeader(int(result["statusCode"].(float64)))
+	fmt.Fprintf(w, jOut)
 }
 
 //handleServeUploadPage serves the static html file
@@ -58,10 +84,21 @@ func handleUploadLog(w http.ResponseWriter, r *http.Request) {
 
 	// return that we have successfully uploaded our file!
 	processLogFile(fileBytes, handler.Filename)
+	result := runPipeline(handler.Filename)
 	w.WriteHeader(http.StatusOK)
 	fmt.Fprintf(w, "<h1>Pipeline Status</h1>")
 	fmt.Fprintf(w, "Log File Uploaded Successfully<br>")
-	fmt.Fprintf(w, `<strong>Count Browsers</strong>: <font size="3" color="green">Completed</font><br>`)
-	fmt.Fprintf(w, `<strong>Count Visitors</strong>: <font size="3" color="green">Completed</font><br>`)
+	//iterate over results
+	for k, v := range result {
+		var status string
+		//check status
+		if v {
+			status = `<font size="3" color="green">Completed</font>`
+		} else {
+			status = `<font size="3" color="red">Failed</font>`
+		}
+		//print status
+		fmt.Fprintf(w, "<strong>"+k+"</strong>: "+status+"<br>")
+	}
 
 }

@@ -64,7 +64,7 @@ func main() {
 	var err error
 
 	//Open/Create the DB file for data storage
-	LogStore.db, err = sql.Open("sqlite3", "../ETL.db")
+	LogStore.db, err = sql.Open("sqlite3", "ETL.db")
 	if err != nil {
 		log.Fatal(err)
 	}

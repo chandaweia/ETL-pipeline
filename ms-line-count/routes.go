@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"strconv"
 
 	"github.com/gorilla/mux"
 )
@@ -17,7 +16,7 @@ type CountLinesReq struct {
 
 //fetchBrowserCounts
 func handleCountLines(w http.ResponseWriter, r *http.Request) {
-
+	log.Println("Handling Count lines")
 	//object for body
 	var CLR CountLinesReq
 
@@ -36,7 +35,12 @@ func handleCountLines(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, e.json, http.StatusBadRequest)
 		return
 	}
-
+	//if no lines then file not found, throw error
+	if len(lf.Logs) < 1 {
+		e := NewError(http.StatusNotFound, CLR.FName+" not found!")
+		http.Error(w, e.json, http.StatusNotFound)
+		return
+	}
 	log.Println("Number of lines:", len(lf.Logs))
 
 	//store num count
@@ -47,10 +51,12 @@ func handleCountLines(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//convert number of lines to string
-	numLines := strconv.Itoa(len(lf.Logs))
+	//create response and get json
+	res := Response{201, "Success"}
+	jOut, _ := res.JSON()
+
 	w.WriteHeader(http.StatusOK)
-	fmt.Fprintf(w, numLines)
+	fmt.Fprintf(w, jOut)
 }
 
 //handleLineCount
@@ -80,7 +86,7 @@ func handleLineCount(w http.ResponseWriter, r *http.Request) {
 	lineCountMap[fname] = lc[0].Count
 
 	//create response and get json
-	res := Response{201, "Success", lineCountMap}
+	res := ResponseInt{201, "Success", lineCountMap}
 	jOut, _ := res.JSON()
 
 	w.WriteHeader(http.StatusOK)
