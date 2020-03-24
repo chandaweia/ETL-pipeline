@@ -79,8 +79,8 @@ func main() {
 	r.HandleFunc("/visitor/count", BasicAuth(handleVisitorCount, "read", "Please enter your username and password for this site")).Methods("GET")
 	r.HandleFunc("/", BasicAuth(handleServeUploadPage, "write", "Please enter your username and password for this site"))
 	r.HandleFunc("/upload/log", BasicAuth(handleUploadLog, "write", "Please enter your username and password for this site"))
-	log.Println("Listening on: ", viper.GetString("endpoints."+ServiceName))
-	log.Fatal(http.ListenAndServe(":"+viper.GetString("endpoints."+ServiceName), r))
+	log.Println("Listening on: ", viper.GetString("services."+ServiceName))
+	log.Fatal(http.ListenAndServe(":"+viper.GetString("services."+ServiceName), r))
 }
 
 //check if element found in golang string
