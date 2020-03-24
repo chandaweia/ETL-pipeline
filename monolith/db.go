@@ -2,7 +2,7 @@ package main
 
 import (
 	"database/sql"
-	"fmt"
+	"log"
 )
 
 //BrowserCountRow represents a row in the database for browser counts
@@ -45,7 +45,7 @@ func (d *Database) fetchUserAuth(perm string) []User {
 
 	rows, err := d.db.Query(sqlStmt)
 	if err != nil {
-		fmt.Println("Failed to fetch browser data: ", err)
+		log.Println("Failed to fetch browser data: ", err)
 	}
 
 	users := []User{}
@@ -53,7 +53,6 @@ func (d *Database) fetchUserAuth(perm string) []User {
 	for rows.Next() {
 		u := User{}
 		rows.Scan(&u.ID, &u.User, &u.Password, &u.Perm)
-		//fmt.Println(bcr.Id, bcr.Key, bcr.Date, bcr.Browser, bcr.Count)
 		users = append(users, u)
 	}
 	return users
@@ -71,14 +70,14 @@ func (d *Database) storeBrowserCount(key string, dt string, b string, c int) boo
 	`
 	statement, err := d.db.Prepare(sqlStmt)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return false
 	}
 
 	_, err = statement.Exec(key, dt, b, c)
 
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return false
 	}
 	return true
@@ -94,7 +93,7 @@ func (d *Database) storeVisitorCount(key string, vc int) bool {
 	`
 	statement, err := d.db.Prepare(sqlStmt)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return false
 	}
 
@@ -102,7 +101,7 @@ func (d *Database) storeVisitorCount(key string, vc int) bool {
 	_, err = statement.Exec(key, vc)
 
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return false
 	}
 	return true
@@ -126,7 +125,7 @@ func (d *Database) StoreLogLine(lf LogFile) {
 	`
 	statement, err := d.db.Prepare(sqlStmt)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return
 	}
 	for _, v := range lf.Logs {
@@ -142,7 +141,7 @@ func (d *Database) fetchBrowserData() []BrowserCountRow {
 	`
 	rows, err := d.db.Query(sqlStmt)
 	if err != nil {
-		fmt.Println("Failed to fetch browser data: ", err)
+		log.Println("Failed to fetch browser data: ", err)
 	}
 
 	browserStats := []BrowserCountRow{}
@@ -150,7 +149,6 @@ func (d *Database) fetchBrowserData() []BrowserCountRow {
 	for rows.Next() {
 		bcr := BrowserCountRow{}
 		rows.Scan(&bcr.Key, &bcr.Date, &bcr.Browser, &bcr.Count)
-		//fmt.Println(bcr.Id, bcr.Key, bcr.Date, bcr.Browser, bcr.Count)
 		browserStats = append(browserStats, bcr)
 	}
 	return browserStats
@@ -163,7 +161,7 @@ func (d *Database) fetchVisitorData() []VisitorCountRow {
 	`
 	rows, err := d.db.Query(sqlStmt)
 	if err != nil {
-		fmt.Println("Failed to fetch browser data: ", err)
+		log.Println("Failed to fetch browser data: ", err)
 	}
 
 	visitorStats := []VisitorCountRow{}
@@ -171,7 +169,6 @@ func (d *Database) fetchVisitorData() []VisitorCountRow {
 	for rows.Next() {
 		vcr := VisitorCountRow{}
 		rows.Scan(&vcr.Key, &vcr.Count)
-		//fmt.Println(bcr.Id, bcr.Key, bcr.Date, bcr.Browser, bcr.Count)
 		visitorStats = append(visitorStats, vcr)
 	}
 	return visitorStats
@@ -240,7 +237,7 @@ func (d *Database) dbInit() {
 	`
 	statement, err := d.db.Prepare(sqlStmt)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return
 	}
 

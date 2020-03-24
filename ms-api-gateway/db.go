@@ -2,7 +2,7 @@ package main
 
 import (
 	"database/sql"
-	"fmt"
+	"log"
 )
 
 //Database controls database functionality
@@ -34,7 +34,7 @@ func (d *Database) StoreLogLine(lf LogFile) {
 	`
 	statement, err := d.db.Prepare(sqlStmt)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return
 	}
 	for _, v := range lf.Logs {

@@ -2,7 +2,7 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
+	"log"
 	"time"
 )
 
@@ -87,7 +87,7 @@ func ConvertMapInterfaceToMapInt(m interface{}) map[string]int {
 func (r *ResponseInt) JSON() (string, error) {
 	jOut, err := json.Marshal(r)
 	if err != nil {
-		fmt.Println("Error Unmarshalling data", err)
+		log.Println("Error Unmarshalling data", err)
 		return "", err
 	}
 
@@ -98,7 +98,7 @@ func (r *ResponseInt) JSON() (string, error) {
 func (r *ResponseString) JSON() (string, error) {
 	jOut, err := json.Marshal(r)
 	if err != nil {
-		fmt.Println("Error Unmarshalling data", err)
+		log.Println("Error Unmarshalling data", err)
 		return "", err
 	}
 
@@ -109,7 +109,7 @@ func (r *ResponseString) JSON() (string, error) {
 func (r *Response) JSON() (string, error) {
 	jOut, err := json.Marshal(r)
 	if err != nil {
-		fmt.Println("Error Unmarshalling data", err)
+		log.Println("Error Unmarshalling data", err)
 		return "", err
 	}
 
@@ -120,7 +120,7 @@ func (r *Response) JSON() (string, error) {
 func (r *ErrorResponse) JSON() (string, error) {
 	jOut, err := json.Marshal(r)
 	if err != nil {
-		fmt.Println("Error Unmarshalling data", err)
+		log.Println("Error Unmarshalling data", err)
 		return "", err
 	}
 

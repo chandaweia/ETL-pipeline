@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 )
 
@@ -50,7 +51,7 @@ func handleBrowserCount(w http.ResponseWriter, r *http.Request) {
 
 	jOut, err := json.Marshal(browserStats)
 	if err != nil {
-		fmt.Println("Error Unmarshalling data", err)
+		log.Println("Error Unmarshalling data", err)
 	}
 	w.WriteHeader(http.StatusOK)
 	fmt.Fprintf(w, string(jOut))
@@ -74,7 +75,7 @@ func handleVisitorCount(w http.ResponseWriter, r *http.Request) {
 
 	jOut, err := json.Marshal(visitorStats)
 	if err != nil {
-		fmt.Println("Error Unmarshalling data", err)
+		log.Println("Error Unmarshalling data", err)
 	}
 
 	w.WriteHeader(http.StatusOK)
@@ -97,8 +98,8 @@ func handleUploadLog(w http.ResponseWriter, r *http.Request) {
 	// the Header and the size of the file
 	file, handler, err := r.FormFile("myFile")
 	if err != nil {
-		fmt.Println("Error Retrieving the File")
-		fmt.Println(err)
+		log.Println("Error Retrieving the File")
+		log.Println(err)
 		return
 	}
 
@@ -109,7 +110,7 @@ func handleUploadLog(w http.ResponseWriter, r *http.Request) {
 	// byte array
 	fileBytes, err := ioutil.ReadAll(file)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	}
 
 	// return that we have successfully uploaded our file!

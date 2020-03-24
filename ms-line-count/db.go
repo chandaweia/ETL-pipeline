@@ -2,7 +2,6 @@ package main
 
 import (
 	"database/sql"
-	"fmt"
 	"log"
 )
 
@@ -26,7 +25,7 @@ func (d *Database) StoreCountLines(fname string, count int) error {
 	`
 	statement, err := d.db.Prepare(sqlStmt)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return err
 	}
 
@@ -42,8 +41,12 @@ func (d *Database) StoreCountLines(fname string, count int) error {
 
 //fetchData allows you to fetch log data from db.
 func (d *Database) fetchLineCount(fname string) ([]LineCountRow, error) {
-	rows, _ := d.db.Query("SELECT * FROM lineCount where key='" + fname + "'")
 	lc := []LineCountRow{}
+	rows, err := d.db.Query("SELECT * FROM lineCount where key='" + fname + "'")
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
 	for rows.Next() {
 		lcr := LineCountRow{}
 		err := rows.Scan(&lcr.Key,
@@ -59,8 +62,12 @@ func (d *Database) fetchLineCount(fname string) ([]LineCountRow, error) {
 
 //fetchData allows you to fetch log data from db.
 func (d *Database) fetchData(fname string) (LogFile, error) {
-	rows, _ := d.db.Query("SELECT * FROM logs where name='" + fname + "'")
 	lf := LogFile{}
+	rows, err := d.db.Query("SELECT * FROM logs where name='" + fname + "'")
+	if err != nil {
+		log.Println(err)
+		return lf, err
+	}
 	for rows.Next() {
 		logLine := LogLine{}
 		err := rows.Scan(&logLine.Name,

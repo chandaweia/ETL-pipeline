@@ -2,7 +2,6 @@ package main
 
 import (
 	"bufio"
-	"fmt"
 	"log"
 	"strconv"
 	"strings"
@@ -110,7 +109,7 @@ func countBrowsers(LogStore Database) {
 
 		keyPieces := strings.Split(b, "_")
 		if !LogStore.storeBrowserCount(b, keyPieces[1], keyPieces[0], v) {
-			fmt.Println("Failed to store ", b)
+			log.Println("Failed to store ", b)
 		}
 	}
 
@@ -152,7 +151,7 @@ func countVisitors(LogStore Database) {
 	for k, v := range visitorCount {
 		//store data in database.
 		if !LogStore.storeVisitorCount(k, v) {
-			fmt.Println("Failed to store ", k)
+			log.Println("Failed to store ", k)
 		}
 	}
 

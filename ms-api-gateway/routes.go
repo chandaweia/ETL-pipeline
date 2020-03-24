@@ -67,8 +67,8 @@ func handleUploadLog(w http.ResponseWriter, r *http.Request) {
 	// the Header and the size of the file
 	file, handler, err := r.FormFile("myFile")
 	if err != nil {
-		fmt.Println("Error Retrieving the File")
-		fmt.Println(err)
+		log.Println("Error Retrieving the File")
+		log.Println(err)
 		return
 	}
 
@@ -79,7 +79,7 @@ func handleUploadLog(w http.ResponseWriter, r *http.Request) {
 	// byte array
 	fileBytes, err := ioutil.ReadAll(file)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	}
 
 	//clean log file and store in db

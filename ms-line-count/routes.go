@@ -46,6 +46,7 @@ func handleCountLines(w http.ResponseWriter, r *http.Request) {
 	//store num count
 	err = LogStore.StoreCountLines(CLR.FName, len(lf.Logs))
 	if err != nil {
+		log.Println(err)
 		e := NewError(http.StatusBadRequest, err.Error())
 		http.Error(w, e.json, http.StatusBadRequest)
 		return

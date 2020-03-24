@@ -2,7 +2,6 @@ package main
 
 import (
 	"database/sql"
-	"fmt"
 	"log"
 )
 
@@ -26,7 +25,7 @@ func (d *Database) StoreValue(key string, value int) error {
 	`
 	statement, err := d.db.Prepare(sqlStmt)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return err
 	}
 
@@ -42,7 +41,11 @@ func (d *Database) StoreValue(key string, value int) error {
 
 //fetchData allows you to fetch data from db.
 func (d *Database) fetchValues(fname string) ([]Row, error) {
-	rows, _ := d.db.Query("SELECT * FROM SampleTable ")
+	rows, err := d.db.Query("SELECT * FROM SampleTable ")
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
 	rs := []Row{}
 	for rows.Next() {
 		r := Row{}
