@@ -61,6 +61,28 @@ func NewError(code int, e string) ErrorResponse {
 	return err
 }
 
+//ConvertMapInterfaceToMapString converts generic interface to string/string
+func ConvertMapInterfaceToMapString(m interface{}) map[string]string {
+
+	result_map := map[string]string{}
+	for key, value := range m.(map[string]interface{}) {
+		result_map[key] = value.(string)
+	}
+
+	return result_map
+}
+
+//ConvertMapInterfaceToMapInt converts generic interface to string/int
+func ConvertMapInterfaceToMapInt(m interface{}) map[string]int {
+
+	result_map := map[string]int{}
+	for key, value := range m.(map[string]interface{}) {
+		result_map[key] = int(value.(float64))
+	}
+
+	return result_map
+}
+
 //JSON returns json version of type
 func (r *ResponseInt) JSON() (string, error) {
 	jOut, err := json.Marshal(r)

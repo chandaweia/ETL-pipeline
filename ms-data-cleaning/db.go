@@ -11,17 +11,17 @@ type Database struct {
 	db *sql.DB
 }
 
-//LineCountRow represents a row in the database for line counts
-type LineCountRow struct {
+//Row represents a row in the database for line counts
+type Row struct {
 	Key   string
-	Count int
+	Value int
 }
 
-//StoreCountLines stores a logfile in a database
-func (d *Database) StoreCountLines(fname string, count int) error {
+//StoreValue stores a key and value in a database
+func (d *Database) StoreValue(key string, value int) error {
 
 	sqlStmt := `
-	INSERT INTO lineCount (key, count)
+	INSERT INTO SampleTable (key, value)
 	VALUES (?,?)
 	`
 	statement, err := d.db.Prepare(sqlStmt)
@@ -30,7 +30,7 @@ func (d *Database) StoreCountLines(fname string, count int) error {
 		return err
 	}
 
-	_, err = statement.Exec(fname, count)
+	_, err = statement.Exec(key, value)
 	if err != nil {
 		log.Println("Failed to execute sql", err)
 		return err
@@ -40,56 +40,32 @@ func (d *Database) StoreCountLines(fname string, count int) error {
 
 }
 
-//fetchData allows you to fetch log data from db.
-func (d *Database) fetchLineCount(fname string) ([]LineCountRow, error) {
-	rows, _ := d.db.Query("SELECT * FROM lineCount where key='" + fname + "'")
-	lc := []LineCountRow{}
+//fetchData allows you to fetch data from db.
+func (d *Database) fetchValues(fname string) ([]Row, error) {
+	rows, _ := d.db.Query("SELECT * FROM SampleTable ")
+	rs := []Row{}
 	for rows.Next() {
-		lcr := LineCountRow{}
-		err := rows.Scan(&lcr.Key,
-			&lcr.Count)
+		r := Row{}
+		err := rows.Scan(&r.Key,
+			&r.Value)
 		if err != nil {
 			log.Println("Failed to fetch data from db: ", err)
-			return lc, err
+			return rs, err
 		}
-		lc = append(lc, lcr)
+		rs = append(rs, r)
 	}
-	return lc, nil
+	return rs, nil
 }
 
-//fetchData allows you to fetch log data from db.
-func (d *Database) fetchData(fname string) (LogFile, error) {
-	rows, _ := d.db.Query("SELECT * FROM logs where name='" + fname + "'")
-	lf := LogFile{}
-	for rows.Next() {
-		logLine := LogLine{}
-		err := rows.Scan(&logLine.Name,
-			&logLine.RawLog,
-			&logLine.RemoteAddr,
-			&logLine.TimeLocal,
-			&logLine.RequestType,
-			&logLine.RequestPath,
-			&logLine.Status,
-			&logLine.BodyBytesSent,
-			&logLine.HTTPReferer,
-			&logLine.HTTPUserAgent,
-			&logLine.Created)
-		if err != nil {
-			log.Println("Failed to fetch data from db: ", err)
-			return lf, err
-		}
-		lf.Logs = append(lf.Logs, logLine)
-	}
-	return lf, nil
-}
-
+//dbinit function will create a table for use for this microservice.
+//Change this to include the table you need for your service
 func (d *Database) dbinit() {
 
 	//create browser table
 	sqlStmt := `
-	CREATE TABLE IF NOT EXISTS lineCount (
+	CREATE TABLE IF NOT EXISTS SampleTable (
 		key TEXT,
-		count int
+		VALUE int
 		)
 	`
 

@@ -34,7 +34,7 @@ func ReadConfig() {
 func main() {
 
 	//DEFINE THE SERVICE NAME. CHANGE THIS TO MATCH A LINE IN CONFIG FILE
-	ServiceName = "ms-line-count"
+	ServiceName = "ms-data-cleaning"
 
 	//Start DB connection
 	LogStore = Database{}
@@ -44,17 +44,24 @@ func main() {
 
 	var err error
 
-	//Open/Create the DB file for data storage
+	//Open/Create the DB file for data storage. This is shared across all microservices. DO NOT CHANGE
 	LogStore.db, err = sql.Open("sqlite3", "../ETL.db")
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer LogStore.db.Close()
 
+	//init database
+	LogStore.dbinit()
+
 	//Define routes.
 	r := mux.NewRouter()
-	r.HandleFunc("/lines/count", handleCountLines).Methods("POST")
-	r.HandleFunc("/lines/count/{fname}", handleLineCount).Methods("GET")
+
+	//Define your routes here. You may need to add more routes here.
+	r.HandleFunc("/route", handleRoute).Methods("POST")
+	r.HandleFunc("/route/with/{PARAM_NAME}", handleRouteParameter).Methods("GET")
+
+	//Serve the webserver. You should not change this
 	log.Println("Listening on: ", viper.GetString("services."+ServiceName))
 	log.Fatal(http.ListenAndServe(":"+viper.GetString("services."+ServiceName), r))
 }
