@@ -82,7 +82,7 @@ func handleUploadLog(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(err)
 	}
 
-	// return that we have successfully uploaded our file!
+	//clean log file and store in db
 	processLogFile(fileBytes, handler.Filename)
 	result := runPipeline(handler.Filename)
 	w.WriteHeader(http.StatusOK)

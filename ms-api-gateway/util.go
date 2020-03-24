@@ -74,6 +74,8 @@ func countLines(fname string) bool {
 	return true
 }
 
+//THIS FUNCTIONALITY NEEDS TO BE MOVED TO ms-data-cleaning
+//TO TEST YOUR IMPLEMENTATION, COMMENT THIS OUT AND SEE IF LINE COUNT STILL WORKS.
 //processLogFile takes in an uploaded logfile, stores the data, processes stats.
 func processLogFile(rawLogFile []byte, fname string) bool {
 	var lines []string
@@ -91,6 +93,8 @@ func processLogFile(rawLogFile []byte, fname string) bool {
 	return true
 }
 
+//THIS FUNCTIONALITY NEEDS TO BE MOVED TO ms-data-cleaning
+//TO TEST YOUR IMPLEMENTATION, COMMENT THIS OUT AND SEE IF LINE COUNT STILL WORKS.
 //parseFile will take a slice of strings and parse the fields.
 func parseFile(lines []string, fname string) LogFile {
 
