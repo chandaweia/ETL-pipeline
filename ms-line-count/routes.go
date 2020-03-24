@@ -53,7 +53,7 @@ func handleCountLines(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, numLines)
 }
 
-//fetchBrowserCounts
+//handleLineCount
 func handleLineCount(w http.ResponseWriter, r *http.Request) {
 
 	//fetch parameters from url

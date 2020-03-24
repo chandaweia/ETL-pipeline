@@ -17,7 +17,7 @@ var LogStore Database
 //ServiceName is the name of this service. It will match the service in the config file.
 var ServiceName string
 
-//ReadConfig reads the config from a file DO NOT MODIFY
+//ReadConfig reads the config from a file
 func ReadConfig() {
 	// Set the file name of the configurations file
 	viper.SetConfigName("config")
@@ -34,7 +34,7 @@ func ReadConfig() {
 func main() {
 
 	//DEFINE THE SERVICE NAME. CHANGE THIS TO MATCH A LINE IN CONFIG FILE
-	ServiceName = "ms-line-count"
+	ServiceName = "ms-api-gateway"
 
 	//Start DB connection
 	LogStore = Database{}
@@ -53,8 +53,8 @@ func main() {
 
 	//Define routes.
 	r := mux.NewRouter()
-	r.HandleFunc("/lines/count", handleCountLines).Methods("POST")
-	r.HandleFunc("/lines/count/{fname}", handleLineCount).Methods("GET")
-	log.Println("Listening on: ", viper.GetString("services."+ServiceName))
-	log.Fatal(http.ListenAndServe(":"+viper.GetString("services."+ServiceName), r))
+	r.HandleFunc("/", handleServeUploadPage)
+	r.HandleFunc("/upload/log", handleUploadLog)
+	log.Println("Listening on: ", viper.GetString("endpoints."+ServiceName))
+	log.Fatal(http.ListenAndServe(":"+viper.GetString("endpoints."+ServiceName), r))
 }
