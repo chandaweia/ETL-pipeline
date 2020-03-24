@@ -52,7 +52,7 @@ func main() {
 	defer LogStore.db.Close()
 
 	//init database
-	LogStore.dbinit()
+	LogStore.dbInit()
 
 	//Define routes.
 	r := mux.NewRouter()

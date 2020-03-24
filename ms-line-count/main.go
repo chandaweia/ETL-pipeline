@@ -51,6 +51,9 @@ func main() {
 	}
 	defer LogStore.db.Close()
 
+	//init database
+	LogStore.dbInit()
+
 	//Define routes.
 	r := mux.NewRouter()
 	r.HandleFunc("/lines/count", handleCountLines).Methods("POST")

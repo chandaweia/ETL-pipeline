@@ -43,7 +43,7 @@ func (d *Database) StoreLogLine(lf LogFile) {
 	}
 }
 
-func (d *Database) dbinit() {
+func (d *Database) dbInit() {
 
 	//create logs table
 	sqlStmt := `

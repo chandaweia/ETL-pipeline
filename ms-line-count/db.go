@@ -83,7 +83,7 @@ func (d *Database) fetchData(fname string) (LogFile, error) {
 	return lf, nil
 }
 
-func (d *Database) dbinit() {
+func (d *Database) dbInit() {
 
 	//create browser table
 	sqlStmt := `

@@ -59,7 +59,7 @@ func (d *Database) fetchValues(fname string) ([]Row, error) {
 
 //dbinit function will create a table for use for this microservice.
 //Change this to include the table you need for your service
-func (d *Database) dbinit() {
+func (d *Database) dbInit() {
 
 	//create browser table
 	sqlStmt := `

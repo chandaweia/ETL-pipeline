@@ -51,6 +51,9 @@ func main() {
 	}
 	defer LogStore.db.Close()
 
+	//Create table if not found
+	LogStore.dbInit()
+
 	//Define routes.
 	r := mux.NewRouter()
 	r.HandleFunc("/lines/count/{fname}", handleLinesCount).Methods("GET")
