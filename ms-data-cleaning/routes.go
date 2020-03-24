@@ -14,6 +14,7 @@ type BodyStruct struct {
 	FName string `json:"fname"`
 }
 
+//YOU WILL NEED TO CHANGE THIS TO THE REAL FUNCTIONALITY
 //handleRoute handles the root route
 func handleRoute(w http.ResponseWriter, r *http.Request) {
 
@@ -44,6 +45,7 @@ func handleRoute(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, jOut)
 }
 
+//YOU WILL NEED TO CHANGE THIS TO THE REAL FUNCTIONALITY
 //handleRouteParameter
 func handleRouteParameter(w http.ResponseWriter, r *http.Request) {
 
